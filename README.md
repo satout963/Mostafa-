@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -30,6 +29,7 @@
             <th>الطرف الأول</th>
             <th>الطرف الثاني</th>
             <th>دائن</th>
+            <th>أجور</th>
             <th>مدين</th>
         </tr>
     </thead>
@@ -38,10 +38,15 @@
             <td><input type="text" value="شركة برسان" readonly></td>
             <td><input type="text" value="أبو قصي" readonly></td>
             <td><input type="number" placeholder="8000"></td>
+            <td><input type="number" placeholder="0"></td>
             <td><input type="number" placeholder="12000"></td>
         </tr>
     </tbody>
 </table>
+
+<p style="margin-top: 15px; font-size: 14px; color: #555;">
+ملاحظة: <strong>الدائن</strong> هو من له مبلغ على الطرف الآخر، و<strong>المدين</strong> هو من عليه دفع ذلك المبلغ.
+</p>
 
 <button onclick="addRow()">➕ أضف عملية جديدة</button>
 <button onclick="calculateAll()">✅ احسب الكل</button>
@@ -56,7 +61,7 @@ function addRow() {
 
     const names = ["شركة برسان", "أبو قصي"];
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
         let newCell = document.createElement("td");
         let input = document.createElement("input");
 
@@ -66,7 +71,7 @@ function addRow() {
             input.readOnly = true;
         } else {
             input.type = "number";
-            input.placeholder = i === 2 ? "8000" : "12000";
+            input.placeholder = i === 2 ? "8000" : i === 3 ? "0" : "12000";
         }
 
         newCell.appendChild(input);
@@ -87,21 +92,19 @@ function calculateAll() {
         let c1 = inputs[0].value;
         let c2 = inputs[1].value;
         let credit = parseFloat(inputs[2].value) || 0;
-        let debit = parseFloat(inputs[3].value) || 0;
+        let fees = parseFloat(inputs[3].value) || 0;
+        let debit = parseFloat(inputs[4].value) || 0;
+        let totalCredit = credit + fees;
 
-        results += `📌 عملية ${i + 1} - (${now})
-`;
-        if (credit > debit) {
-            let diff = (credit - debit).toFixed(2);
-            results += `${c1} له ${diff} دولار على ${c2}
-`;
-        } else if (debit > credit) {
-            let diff = (debit - credit).toFixed(2);
-            results += `${c2} له ${diff} دولار على ${c1}
-`;
+        results += `📌 عملية ${i + 1} - (${now})\n`;
+        if (totalCredit > debit) {
+            let diff = (totalCredit - debit).toFixed(2);
+            results += `${c1} له ${diff} دولار على ${c2}\n`;
+        } else if (debit > totalCredit) {
+            let diff = (debit - totalCredit).toFixed(2);
+            results += `${c2} له ${diff} دولار على ${c1}\n`;
         } else {
-            results += `الرصيد متطابق بين ${c1} و ${c2}
-`;
+            results += `الرصيد متطابق بين ${c1} و ${c2}\n`;
         }
         results += "--------------------------\n";
     }
